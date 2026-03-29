@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { questionsApi, activityApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
-import Editor from '@monaco-editor/react'
 import {
   ArrowLeft, CheckCircle, Bookmark, BookmarkCheck, Code,
   Clock, HardDrive, FileText, Terminal, AlertTriangle
@@ -11,7 +10,7 @@ import {
 
 /**
  * Página de detalle de una pregunta individual.
- * Muestra descripción, campos de coding (si aplica), solución, y un editor Monaco.
+ * Muestra descripción, campos de coding (si aplica), y solución.
  */
 export default function QuestionDetail() {
   const { id } = useParams()
@@ -22,18 +21,12 @@ export default function QuestionDetail() {
   const [question, setQuestion] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showAnswer, setShowAnswer] = useState(false)
-  const [editorValue, setEditorValue] = useState('// Write your solution here\n\n')
 
   useEffect(() => {
     const loadQuestion = async () => {
       try {
         const res = await questionsApi.getById(id)
         setQuestion(res.data)
-        // Si tiene boilerplate code, usarlo como valor inicial del editor
-        if (res.data.boilerplateCode) {
-          setEditorValue(res.data.boilerplateCode)
-        }
-      } catch (err) {
         showToast('Question not found', 'error')
         navigate('/questions')
       } finally {
@@ -44,23 +37,32 @@ export default function QuestionDetail() {
   }, [id])
 
   const handleComplete = async () => {
+    // Optimistic update
+    const previousQuestion = { ...question }
+    const newCompletedState = !question.completed
+    setQuestion(prev => ({ ...prev, completed: newCompletedState }))
+    
     try {
       await activityApi.markCompleted(question.id)
-      setQuestion(prev => ({ ...prev, completed: !prev.completed }))
       showToast(
-        question.completed ? 'Marked as incomplete' : 'Marked as complete!',
+        newCompletedState ? 'Marked as complete!' : 'Marked as incomplete',
         'success'
       )
     } catch (err) {
+      // Revert if error
+      setQuestion(previousQuestion)
       showToast('Failed to update', 'error')
     }
   }
 
   const handleBookmark = async () => {
+    const previousQuestion = { ...question }
+    setQuestion(prev => ({ ...prev, bookmarked: !prev.bookmarked }))
+
     try {
       await activityApi.toggleBookmark(question.id)
-      setQuestion(prev => ({ ...prev, bookmarked: !prev.bookmarked }))
     } catch (err) {
+      setQuestion(previousQuestion)
       showToast('Failed to update bookmark', 'error')
     }
   }
@@ -76,16 +78,6 @@ export default function QuestionDetail() {
   if (!question) return null
 
   const isCoding = question.questionType === 'CODING'
-
-  // Determinar lenguaje del editor Monaco según la pregunta
-  const editorLanguage = (() => {
-    const lang = question.programmingLanguage || 'java'
-    const langMap = {
-      java: 'java', python: 'python', cpp: 'cpp',
-      javascript: 'javascript', c: 'c', go: 'go',
-    }
-    return langMap[lang] || 'java'
-  })()
 
   return (
     <div className="page-container" style={{ maxWidth: 960 }}>
@@ -314,47 +306,6 @@ export default function QuestionDetail() {
             )}
           </div>
         )}
-
-        {/* Editor Monaco — mostrar siempre para coding, opcionalmente para theory */}
-        <div className="card" style={{ marginBottom: '1rem' }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '0.5rem',
-            marginBottom: '0.75rem',
-          }}>
-            <Code size={18} style={{ color: 'var(--color-primary)' }} />
-            <h2 style={{ fontSize: '1rem', fontWeight: 600 }}>Code Editor</h2>
-            {isCoding && question.programmingLanguage && (
-              <span style={{
-                fontSize: '0.7rem', padding: '0.15rem 0.5rem',
-                borderRadius: 6, background: 'var(--bg-tertiary)',
-                color: 'var(--text-muted)', fontWeight: 600,
-                textTransform: 'uppercase',
-              }}>
-                {question.programmingLanguage}
-              </span>
-            )}
-          </div>
-          <div style={{
-            border: '1px solid var(--border-color)',
-            borderRadius: 10,
-            overflow: 'hidden',
-          }}>
-            <Editor
-              height="400px"
-              defaultLanguage={editorLanguage}
-              theme="vs-dark"
-              value={editorValue}
-              onChange={(value) => setEditorValue(value)}
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                padding: { top: 16 },
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-              }}
-            />
-          </div>
-        </div>
 
         {/* Solución */}
         {question.answer && (

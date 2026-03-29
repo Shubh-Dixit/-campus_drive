@@ -76,30 +76,36 @@ export default function StudentDashboard() {
 
   const handleToggleComplete = async (e, questionId) => {
     e.stopPropagation()
+    // Optimistic update
+    const previousQuestions = [...questions]
+    setQuestions(prev => prev.map(q =>
+      q.id === questionId ? { ...q, completed: !q.completed } : q
+    ))
+
     try {
       await activityApi.markCompleted(questionId)
-      // Actualizar estado local para feedback inmediato
-      setQuestions(prev => prev.map(q =>
-        q.id === questionId ? { ...q, completed: !q.completed } : q
-      ))
-      // Actualizar estadísticas
       const statsRes = await activityApi.getStats()
       setStats(statsRes.data)
     } catch (err) {
+      // Revert on error
+      setQuestions(previousQuestions)
       showToast('Failed to update progress', 'error')
     }
   }
 
   const handleToggleBookmark = async (e, questionId) => {
     e.stopPropagation()
+    const previousQuestions = [...questions]
+    setQuestions(prev => prev.map(q =>
+      q.id === questionId ? { ...q, bookmarked: !q.bookmarked } : q
+    ))
+
     try {
       await activityApi.toggleBookmark(questionId)
-      setQuestions(prev => prev.map(q =>
-        q.id === questionId ? { ...q, bookmarked: !q.bookmarked } : q
-      ))
       const statsRes = await activityApi.getStats()
       setStats(statsRes.data)
     } catch (err) {
+      setQuestions(previousQuestions)
       showToast('Failed to update bookmark', 'error')
     }
   }
