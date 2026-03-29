@@ -366,6 +366,10 @@ a:hover {
   border-radius: 8px;
 }
 
+.mobile-menu-btn {
+  display: none !important;
+}
+
 /* ============================================
    Cards
    ============================================ */
@@ -917,6 +921,10 @@ a:hover {
    Responsive
    ============================================ */
 @media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+
   .sidebar {
     transform: translateX(-100%);
     width: 260px;
