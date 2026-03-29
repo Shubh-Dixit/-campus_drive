@@ -29,6 +29,7 @@ public class QuestionController {
             @RequestParam(defaultValue = "") String search,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String difficulty,
+            @RequestParam(defaultValue = "false") boolean bookmarkedOnly,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -42,7 +43,7 @@ public class QuestionController {
 
         User currentUser = extractUser(authentication);
         Page<QuestionDto> questions = questionService.getQuestions(
-                search, categoryId, difficulty, pageable, currentUser);
+                search, categoryId, difficulty, bookmarkedOnly, pageable, currentUser);
 
         return ResponseEntity.ok(questions);
     }

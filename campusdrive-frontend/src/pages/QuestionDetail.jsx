@@ -27,6 +27,7 @@ export default function QuestionDetail() {
       try {
         const res = await questionsApi.getById(id)
         setQuestion(res.data)
+      } catch (err) {
         showToast('Question not found', 'error')
         navigate('/questions')
       } finally {

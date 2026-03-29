@@ -13,31 +13,30 @@ import {
  * Dashboard del estudiante estilo LeetCode.
  * Muestra estadísticas, filtros, y lista de preguntas con paginación.
  */
-export default function StudentDashboard() {
+export default function QuestionsPage() {
   const [questions, setQuestions] = useState([])
   const [categories, setCategories] = useState([])
-  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
 
-  // Paginación para Bookmarks
+  // Filtros
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [search, setSearch] = useState(searchParams.get('search') || '')
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null)
   const [page, setPage] = useState(0)
 
   const navigate = useNavigate()
   const { user } = useAuth()
   const { showToast } = useToast()
 
-  // Cargar categorías y estadísticas al montar
+  // Cargar categorías al montar
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const [catRes, statsRes] = await Promise.all([
-          categoriesApi.getAll(),
-          activityApi.getStats(),
-        ])
+        const catRes = await categoriesApi.getAll()
         setCategories(catRes.data)
-        setStats(statsRes.data)
       } catch (err) {
         console.error('Error loading initial data:', err)
       }
@@ -45,15 +44,17 @@ export default function StudentDashboard() {
     loadInitialData()
   }, [])
 
-  // Cargar preguntas cacheadas/bookmarked
+  // Cargar preguntas con filtros
   useEffect(() => {
     const loadQuestions = async () => {
       setLoading(true)
       try {
         const params = {
           page,
-          size: 10,
-          bookmarkedOnly: true,
+          size: 20,
+          search: search || '',
+          ...(selectedCategory && { categoryId: selectedCategory }),
+          ...(selectedDifficulty && { difficulty: selectedDifficulty }),
         }
         const res = await questionsApi.getAll(params)
         setQuestions(res.data.content)
@@ -66,7 +67,7 @@ export default function StudentDashboard() {
       }
     }
     loadQuestions()
-  }, [page])
+  }, [page, search, selectedCategory, selectedDifficulty])
 
   const handleToggleComplete = async (e, questionId) => {
     e.stopPropagation()
@@ -78,8 +79,6 @@ export default function StudentDashboard() {
 
     try {
       await activityApi.markCompleted(questionId)
-      const statsRes = await activityApi.getStats()
-      setStats(statsRes.data)
     } catch (err) {
       // Revert on error
       setQuestions(previousQuestions)
@@ -96,111 +95,89 @@ export default function StudentDashboard() {
 
     try {
       await activityApi.toggleBookmark(questionId)
-      const statsRes = await activityApi.getStats()
-      setStats(statsRes.data)
     } catch (err) {
       setQuestions(previousQuestions)
       showToast('Failed to update bookmark', 'error')
     }
   }
 
-
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      setPage(0)
+    }
+  }
 
   return (
     <div className="page-container">
       {/* Encabezado */}
       <div className="page-header">
         <div>
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="page-title">Questions</h1>
           <p className="page-subtitle">
-            Welcome back! Here is your progress so far.
+            {totalElements} questions available • Practice and prepare for placements
           </p>
         </div>
       </div>
 
-      {/* Tarjetas de estadísticas */}
-      {stats && (
-        <div className="stats-grid">
-          <div className="stat-card animate-fade-in">
-            <div className="stat-card-icon" style={{
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15))'
-            }}>
-              <BookOpen size={22} style={{ color: 'var(--color-primary)' }} />
-            </div>
-            <div>
-              <div className="stat-card-value">{stats.totalQuestions}</div>
-              <div className="stat-card-label">Total Questions</div>
-            </div>
-          </div>
 
-          <div className="stat-card animate-fade-in" style={{ animationDelay: '0.05s' }}>
-            <div className="stat-card-icon" style={{
-              background: 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(22,163,74,0.15))'
-            }}>
-              <CheckCircle size={22} style={{ color: 'var(--color-easy)' }} />
-            </div>
-            <div>
-              <div className="stat-card-value">{stats.completedByUser}</div>
-              <div className="stat-card-label">Completed</div>
-            </div>
-          </div>
 
-          <div className="stat-card animate-fade-in" style={{ animationDelay: '0.1s' }}>
-            <div className="stat-card-icon" style={{
-              background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.15))'
-            }}>
-              <Bookmark size={22} style={{ color: 'var(--color-medium)' }} />
-            </div>
-            <div>
-              <div className="stat-card-value">{stats.bookmarkedByUser}</div>
-              <div className="stat-card-label">Bookmarked</div>
-            </div>
-          </div>
-
-          <div className="stat-card animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            <div className="stat-card-icon" style={{
-              background: 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(8,145,178,0.15))'
-            }}>
-              <Target size={22} style={{ color: 'var(--color-accent)' }} />
-            </div>
-            <div>
-              <div className="stat-card-value">
-                {stats.totalQuestions > 0
-                  ? Math.round((stats.completedByUser / stats.totalQuestions) * 100)
-                  : 0}%
-              </div>
-              <div className="stat-card-label">Progress</div>
-            </div>
-          </div>
+      {/* Barra de filtros */}
+      <div className="filter-bar">
+        <div className="navbar-search" style={{ width: 280 }}>
+          <Search size={16} style={{ color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            placeholder="Search questions..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleSearch}
+          />
         </div>
-      )}
 
-      <div style={{ marginTop: '2rem', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Your Bookmarked Questions</h2>
-        {totalElements > 0 && (
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>You have {totalElements} bookmarked questions.</p>
-        )}
+        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+          <button
+            className={`filter-chip ${!selectedDifficulty ? 'active' : ''}`}
+            onClick={() => { setSelectedDifficulty(null); setPage(0) }}
+          >
+            All
+          </button>
+          {['EASY', 'MEDIUM', 'HARD'].map(d => (
+            <button
+              key={d}
+              className={`filter-chip ${selectedDifficulty === d ? 'active' : ''}`}
+              onClick={() => { setSelectedDifficulty(d === selectedDifficulty ? null : d); setPage(0) }}
+            >
+              {d.charAt(0) + d.slice(1).toLowerCase()}
+            </button>
+          ))}
+        </div>
+
+        <select
+          className="form-select"
+          style={{ padding: '0.375rem 0.75rem', fontSize: '0.8rem', borderRadius: 99 }}
+          value={selectedCategory || ''}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value || null)
+            setPage(0)
+          }}
+        >
+          <option value="">All Categories</option>
+          {categories.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
       </div>
 
-      {/* Lista de preguntas bookmarked */}
+      {/* Lista de preguntas (estilo LeetCode) */}
       {loading ? (
         <div className="loading-page">
           <div className="spinner" />
         </div>
       ) : questions.length === 0 ? (
         <div className="empty-state">
-          <Bookmark size={64} style={{ opacity: 0.5 }} />
-          <h3 style={{ marginTop: '0.5rem', fontWeight: 600 }}>No Bookmarks Yet</h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-             Star questions from the Questions page to see them here!
-          </p>
-          <button 
-             className="btn btn-primary" 
-             style={{ marginTop: '1rem' }}
-             onClick={() => navigate('/questions')}
-          >
-             Browse Questions
-          </button>
+          <BookOpen size={64} />
+          <h3 style={{ marginTop: '0.5rem', fontWeight: 600 }}>No questions found</h3>
+          <p style={{ fontSize: '0.85rem' }}>Try adjusting your filters or search terms</p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

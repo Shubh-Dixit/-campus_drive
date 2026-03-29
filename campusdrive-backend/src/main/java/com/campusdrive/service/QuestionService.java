@@ -12,5 +12,5 @@ public interface QuestionService {
     void deleteQuestion(Long id);
     QuestionDto getQuestionById(Long id, User currentUser);
     Page<QuestionDto> getQuestions(String search, Long categoryId,
-                                   String difficulty, Pageable pageable, User currentUser);
+                                   String difficulty, boolean bookmarkedOnly, Pageable pageable, User currentUser);
 }

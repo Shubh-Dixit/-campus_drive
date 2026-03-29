@@ -40,4 +40,17 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     long countByDifficulty(Difficulty difficulty);
 
     long countByCategory(Category category);
+
+    @Query("SELECT q FROM Question q WHERE " +
+           "(LOWER(q.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(q.description) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "AND (:categoryId IS NULL OR q.category.id = :categoryId) " +
+           "AND (:difficulty IS NULL OR q.difficulty = :difficulty) " +
+           "AND q.id IN :questionIds")
+    Page<Question> findByFiltersAndIds(
+            @Param("search") String search,
+            @Param("categoryId") Long categoryId,
+            @Param("difficulty") Difficulty difficulty,
+            @Param("questionIds") java.util.List<Long> questionIds,
+            Pageable pageable);
 }

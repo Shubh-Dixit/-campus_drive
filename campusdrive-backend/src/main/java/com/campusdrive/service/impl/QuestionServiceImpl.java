@@ -143,7 +143,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     @Transactional(readOnly = true)
     public Page<QuestionDto> getQuestions(String search, Long categoryId,
-                                          String difficulty, Pageable pageable,
+                                          String difficulty, boolean bookmarkedOnly, Pageable pageable,
                                           User currentUser) {
         Difficulty diff = null;
         if (difficulty != null && !difficulty.isEmpty()) {
@@ -152,8 +152,21 @@ public class QuestionServiceImpl implements QuestionService {
 
         String searchTerm = (search != null && !search.isEmpty()) ? search : "";
 
-        Page<Question> questions = questionRepository.findByFilters(
-                searchTerm, categoryId, diff, pageable);
+        Page<Question> questions;
+        if (bookmarkedOnly && currentUser != null) {
+            java.util.List<Long> bookmarkedIds = bookmarkRepository.findByUser(currentUser)
+                    .stream()
+                    .map(b -> b.getQuestion().getId())
+                    .collect(java.util.stream.Collectors.toList());
+            if (bookmarkedIds.isEmpty()) {
+                return Page.empty(pageable);
+            }
+            questions = questionRepository.findByFiltersAndIds(
+                    searchTerm, categoryId, diff, bookmarkedIds, pageable);
+        } else {
+            questions = questionRepository.findByFilters(
+                    searchTerm, categoryId, diff, pageable);
+        }
 
         return questions.map(q -> mapToDto(q, currentUser));
     }

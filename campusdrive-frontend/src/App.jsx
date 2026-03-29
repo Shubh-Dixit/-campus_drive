@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import DashboardLayout from './components/DashboardLayout'
 import StudentDashboard from './pages/StudentDashboard'
+import QuestionsPage from './pages/QuestionsPage'
 import QuestionDetail from './pages/QuestionDetail'
 import Leaderboard from './pages/Leaderboard'
 import AdminDashboard from './pages/AdminDashboard'
@@ -46,7 +47,7 @@ function App() {
         } />
         
         {/* Rutas de estudiante */}
-        <Route path="/questions" element={<StudentDashboard />} />
+        <Route path="/questions" element={<QuestionsPage />} />
         <Route path="/questions/:id" element={<QuestionDetail />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
 
