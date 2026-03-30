@@ -976,7 +976,7 @@ a:hover {
 /* Contenedor base de cada anuncio */
 .ad-container {
   width: 100%;
-  overflow: hidden;
+  overflow: hidden !important;
   border-radius: 10px;
   /* Transición suave al aparecer */
   animation: fadeIn 0.4s ease-out forwards;
@@ -990,8 +990,9 @@ a:hover {
 }
 
 .ad-banner {
-  min-height: 90px;
-  max-height: 90px;
+  min-height: 90px !important;
+  max-height: 90px !important;
+  height: 90px !important;
 }
 
 /* ── Sidebar Ad ── */
@@ -1002,14 +1003,16 @@ a:hover {
 }
 
 .ad-sidebar {
-  min-height: 250px;
-  max-height: 250px;
+  min-height: 250px !important;
+  max-height: 250px !important;
+  height: 250px !important;
 }
 
 /* ── Inline Ad (entre contenido, ej. entre preguntas) ── */
 .ad-inline {
-  min-height: 90px;
-  max-height: 90px;
+  min-height: 90px !important;
+  max-height: 90px !important;
+  height: 90px !important;
 }
 
 /* ── Footer Ad ── */
@@ -1021,8 +1024,9 @@ a:hover {
 }
 
 .ad-footer {
-  min-height: 90px;
-  max-height: 90px;
+  min-height: 90px !important;
+  max-height: 90px !important;
+  height: 90px !important;
 }
 
 /* Placeholder de desarrollo: fondo ligeramente más visible en dark mode */
@@ -1033,7 +1037,7 @@ a:hover {
 /* Responsive: ocultar sidebar ad en móvil (la barra lateral ya desaparece) */
 @media (max-width: 768px) {
   .sidebar-ad-slot {
-    display: none;
+    display: none !important;
   }
 
   .top-banner-ad-slot,
@@ -1044,8 +1048,9 @@ a:hover {
   .ad-banner,
   .ad-inline,
   .ad-footer {
-    min-height: 50px;
-    max-height: 50px;
+    min-height: 50px !important;
+    max-height: 50px !important;
+    height: 50px !important;
   }
 }
 
