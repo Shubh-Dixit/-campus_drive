@@ -8,6 +8,7 @@ import {
   Filter, ChevronLeft, ChevronRight, Search, Target,
   Code, FileText
 } from 'lucide-react'
+import AdComponent from '../components/AdComponent'
 
 /**
  * Dashboard del estudiante estilo LeetCode.
@@ -118,6 +119,9 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* Google Ad - Top Section */}
+      <AdComponent className="dashboard-ad-top" />
+
       {/* Tarjetas de estadísticas */}
       {stats && (
         <div className="stats-grid">
@@ -174,6 +178,9 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
+
+      {/* Google Ad - Middle Section */}
+      <AdComponent className="dashboard-ad-middle" />
 
       <div style={{ marginTop: '2rem', marginBottom: '1rem' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Your Bookmarked Questions</h2>
@@ -295,6 +302,9 @@ export default function StudentDashboard() {
           </button>
         </div>
       )}
+
+      {/* Google Ad - Bottom Section */}
+      <AdComponent className="dashboard-ad-bottom" />
     </div>
   )
 }

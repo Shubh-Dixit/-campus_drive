@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import AdComponent from './AdComponent'
 import {
   LayoutDashboard, BookOpen, Trophy, Users, FolderOpen,
   Settings, LogOut, ChevronLeft, ChevronRight, Sun, Moon,
@@ -99,6 +100,13 @@ export default function DashboardLayout() {
           })}
         </nav>
 
+        {/* ── Anuncio en Sidebar ─ Solo visible cuando no está colapsado ── */}
+        {!collapsed && (
+          <div style={{ padding: '0 0.75rem', marginTop: 'auto', marginBottom: '0.5rem' }}>
+            <AdComponent className="global-ad-sidebar" style={{ margin: '0.5rem 0' }} />
+          </div>
+        )}
+
         {/* Toggle sidebar */}
         <div className="sidebar-toggle">
           <button
@@ -178,9 +186,22 @@ export default function DashboardLayout() {
           </div>
         </header>
 
+        {/* ── Anuncio Banner Superior ─ Se muestra en todas las páginas ── */}
+        <div style={{
+          padding: '0.5rem 1.5rem 0',
+          borderBottom: '1px solid var(--border-color)',
+        }}>
+          <AdComponent className="global-ad-top-banner" />
+        </div>
+
         {/* Page content */}
         <main>
           <Outlet />
+
+          {/* ── Anuncio Inferior ─ Se muestra al final de cada página ── */}
+          <div style={{ padding: '0 1.5rem 1.5rem' }}>
+            <AdComponent className="global-ad-bottom" />
+          </div>
         </main>
       </div>
     </div>
