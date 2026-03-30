@@ -86,7 +86,7 @@ const AdComponent = memo(function AdComponent({ type = 'banner', style = {} }) {
     <div
       ref={containerRef}
       className={`ad-container ad-${type}`}
-      style={{ ...dimensions, ...style }}
+      style={style}
       aria-label="Advertisement"
       role="complementary"
     >
@@ -98,7 +98,7 @@ const AdComponent = memo(function AdComponent({ type = 'banner', style = {} }) {
         isVisible && (
           <ins
             className="adsbygoogle"
-            style={{ display: 'block', width: '100%', maxHeight: dimensions.minHeight }}
+            style={{ display: 'block', width: '100%', height: '100%' }}
             data-ad-client={AD_CLIENT}
             data-ad-slot={AD_SLOTS[type]}
             data-ad-format={type === 'sidebar' ? 'auto' : 'horizontal'}
@@ -123,7 +123,6 @@ function DevAdPlaceholder({ type }) {
       style={{
         width: '100%',
         height: '100%',
-        minHeight: AD_DIMENSIONS[type]?.minHeight,
         background: config.bg,
         border: `1.5px dashed ${config.border}`,
         borderRadius: '10px',
