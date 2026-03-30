@@ -966,3 +966,80 @@ a:hover {
     display: none;
   }
 }
+
+/* ============================================
+   Google AdSense — Slots de Anuncios
+   Dimensiones fijas para evitar layout shift (CLS)
+   Compatibles con tema claro y oscuro
+   ============================================ */
+
+/* Contenedor base de cada anuncio */
+.ad-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+  /* Transición suave al aparecer */
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* ── Banner Superior (debajo del navbar) ── */
+.top-banner-ad-slot {
+  padding: 0.625rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.ad-banner {
+  min-height: 90px;
+}
+
+/* ── Sidebar Ad ── */
+.sidebar-ad-slot {
+  padding: 0.625rem 0.75rem;
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+}
+
+.ad-sidebar {
+  min-height: 250px;
+}
+
+/* ── Inline Ad (entre contenido, ej. entre preguntas) ── */
+.ad-inline {
+  min-height: 100px;
+}
+
+/* ── Footer Ad ── */
+.footer-ad-slot {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  margin-top: 1rem;
+}
+
+.ad-footer {
+  min-height: 90px;
+}
+
+/* Placeholder de desarrollo: fondo ligeramente más visible en dark mode */
+[data-theme="dark"] .ad-dev-placeholder {
+  opacity: 0.85;
+}
+
+/* Responsive: ocultar sidebar ad en móvil (la barra lateral ya desaparece) */
+@media (max-width: 768px) {
+  .sidebar-ad-slot {
+    display: none;
+  }
+
+  .top-banner-ad-slot,
+  .footer-ad-slot {
+    padding: 0.5rem 1rem;
+  }
+
+  .ad-banner,
+  .ad-footer {
+    min-height: 60px;
+  }
+}
+

@@ -48,6 +48,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/questions/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/leaderboard").permitAll()
+                // Config de anuncios: lectura pública, escritura solo ADMIN
+                .requestMatchers(HttpMethod.GET, "/api/ads/config").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/ads/config").hasRole("ADMIN")
                 // Rutas de administración
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Todo lo demás requiere autenticación

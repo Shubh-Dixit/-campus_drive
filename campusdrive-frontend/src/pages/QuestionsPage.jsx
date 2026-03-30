@@ -8,6 +8,7 @@ import {
   Filter, ChevronLeft, ChevronRight, Search, Target,
   Code, FileText
 } from 'lucide-react'
+import AdComponent from '../components/AdComponent'
 
 /**
  * Dashboard del estudiante estilo LeetCode.
@@ -182,12 +183,20 @@ export default function QuestionsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {questions.map((q, i) => (
-            <div
-              key={q.id}
-              className={`question-card animate-fade-in ${q.completed ? 'completed' : ''}`}
-              style={{ animationDelay: `${i * 0.03}s` }}
-              onClick={() => navigate(`/questions/${q.id}`)}
-            >
+            <>
+              {/* ── Anuncio inline cada 10 preguntas ── */}
+              {i > 0 && i % 10 === 0 && (
+                <div key={`ad-${i}`} style={{ padding: '0.25rem 0' }}>
+                  <AdComponent type="inline" />
+                </div>
+              )}
+
+              <div
+                key={q.id}
+                className={`question-card animate-fade-in ${q.completed ? 'completed' : ''}`}
+                style={{ animationDelay: `${i * 0.03}s` }}
+                onClick={() => navigate(`/questions/${q.id}`)}
+              >
               {/* Estado de completitud */}
               <button
                 className={`question-status ${q.completed ? 'done' : ''}`}
@@ -229,7 +238,8 @@ export default function QuestionsPage() {
               >
                 {q.bookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
               </button>
-            </div>
+              </div>
+            </>
           ))}
         </div>
       )}

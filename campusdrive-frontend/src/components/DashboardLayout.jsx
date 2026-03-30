@@ -5,13 +5,13 @@ import { useTheme } from '../context/ThemeContext'
 import AdComponent from './AdComponent'
 import {
   LayoutDashboard, BookOpen, Trophy, Users, FolderOpen,
-  Settings, LogOut, ChevronLeft, ChevronRight, Sun, Moon,
-  Search, Menu, User, Shield
+  LogOut, ChevronLeft, ChevronRight, Sun, Moon,
+  Search, Menu, Shield
 } from 'lucide-react'
 
 /**
  * Layout principal con sidebar colapsable y navbar.
- * Muestra diferentes links según el rol del usuario.
+ * Los anuncios solo se muestran en páginas de usuario normal (no admin).
  */
 export default function DashboardLayout() {
   const [collapsed, setCollapsed] = useState(false)
@@ -27,6 +27,12 @@ export default function DashboardLayout() {
   }
 
   const isActive = (path) => location.pathname === path
+
+  // Determinar si la ruta actual es una página de administración
+  const isAdminRoute = location.pathname.startsWith('/admin')
+
+  // Los anuncios se muestran SOLO si el usuario no es admin/subadmin
+  const showAds = !isAdminOrSubAdmin()
 
   // Links del sidebar según rol
   const navLinks = [
@@ -52,7 +58,7 @@ export default function DashboardLayout() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">CD</div>
@@ -62,21 +68,13 @@ export default function DashboardLayout() {
         <nav className="sidebar-nav">
           {navLinks.filter(l => l.show).map((link, i) => {
             if (link.type === 'divider') {
-              return <div key={i} style={{
-                height: 1,
-                background: 'var(--border-color)',
-                margin: '0.5rem 0',
-              }} />
+              return <div key={i} style={{ height: 1, background: 'var(--border-color)', margin: '0.5rem 0' }} />
             }
             if (link.type === 'label') {
               return !collapsed && (
                 <div key={i} style={{
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  color: 'var(--text-muted)',
-                  padding: '0.25rem 1rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
+                  fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)',
+                  padding: '0.25rem 1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
                 }}>
                   {link.label}
                 </div>
@@ -87,10 +85,7 @@ export default function DashboardLayout() {
               <div
                 key={link.path}
                 className={`sidebar-link ${isActive(link.path) ? 'active' : ''}`}
-                onClick={() => {
-                  navigate(link.path)
-                  setMobileOpen(false)
-                }}
+                onClick={() => { navigate(link.path); setMobileOpen(false) }}
                 title={collapsed ? link.label : ''}
               >
                 <Icon size={20} />
@@ -100,10 +95,13 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        {/* ── Anuncio en Sidebar ─ Solo visible cuando no está colapsado ── */}
-        {!collapsed && (
-          <div style={{ padding: '0 0.75rem', marginTop: 'auto', marginBottom: '0.5rem' }}>
-            <AdComponent className="global-ad-sidebar" style={{ margin: '0.5rem 0' }} />
+        {/* ──────────────────────────────────────
+            Anuncio Sidebar — visible solo para usuarios normales
+            Se oculta cuando el sidebar está colapsado
+            ────────────────────────────────────── */}
+        {showAds && !collapsed && (
+          <div className="sidebar-ad-slot">
+            <AdComponent type="sidebar" />
           </div>
         )}
 
@@ -119,9 +117,10 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      {/* Contenido principal */}
+      {/* ── Main content area ── */}
       <div className={`main-content ${collapsed ? 'sidebar-collapsed' : ''}`}>
-        {/* Navbar */}
+
+        {/* ── Navbar ── */}
         <header className="navbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
@@ -186,23 +185,28 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        {/* ── Anuncio Banner Superior ─ Se muestra en todas las páginas ── */}
-        <div style={{
-          padding: '0.5rem 1.5rem 0',
-          borderBottom: '1px solid var(--border-color)',
-        }}>
-          <AdComponent className="global-ad-top-banner" />
-        </div>
+        {/* ──────────────────────────────────────
+            Anuncio Banner Superior — aparece en todas las páginas de usuario normal
+            ────────────────────────────────────── */}
+        {showAds && (
+          <div className="top-banner-ad-slot">
+            <AdComponent type="banner" />
+          </div>
+        )}
 
-        {/* Page content */}
+        {/* ── Contenido de la página (Outlet) ── */}
         <main>
           <Outlet />
-
-          {/* ── Anuncio Inferior ─ Se muestra al final de cada página ── */}
-          <div style={{ padding: '0 1.5rem 1.5rem' }}>
-            <AdComponent className="global-ad-bottom" />
-          </div>
         </main>
+
+        {/* ──────────────────────────────────────
+            Anuncio Footer — aparece al final de cada página para usuarios normales
+            ────────────────────────────────────── */}
+        {showAds && (
+          <div className="footer-ad-slot">
+            <AdComponent type="footer" />
+          </div>
+        )}
       </div>
     </div>
   )

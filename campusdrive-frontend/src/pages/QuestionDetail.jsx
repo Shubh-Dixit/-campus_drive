@@ -7,6 +7,7 @@ import {
   ArrowLeft, CheckCircle, Bookmark, BookmarkCheck, Code,
   Clock, HardDrive, FileText, Terminal, AlertTriangle
 } from 'lucide-react'
+import AdComponent from '../components/AdComponent'
 
 /**
  * Página de detalle de una pregunta individual.
@@ -307,6 +308,11 @@ export default function QuestionDetail() {
             )}
           </div>
         )}
+
+        {/* ── Anuncio Inline ─ entre el contenido de la pregunta y la solución ── */}
+        <div style={{ margin: '0.5rem 0' }}>
+          <AdComponent type="inline" />
+        </div>
 
         {/* Solución */}
         {question.answer && (
