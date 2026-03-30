@@ -98,10 +98,10 @@ const AdComponent = memo(function AdComponent({ type = 'banner', style = {} }) {
         isVisible && (
           <ins
             className="adsbygoogle"
-            style={{ display: 'block', width: '100%', height: '100%' }}
+            style={{ display: 'block', width: '100%', maxHeight: dimensions.minHeight }}
             data-ad-client={AD_CLIENT}
             data-ad-slot={AD_SLOTS[type]}
-            data-ad-format="auto"
+            data-ad-format={type === 'sidebar' ? 'auto' : 'horizontal'}
             data-full-width-responsive="true"
           />
         )
