@@ -14,7 +14,6 @@ import {
  * Los anuncios solo se muestran en páginas de usuario normal (no admin).
  */
 export default function DashboardLayout() {
-  const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { user, logout, isAdmin, isAdminOrSubAdmin } = useAuth()
   const { theme, toggleTheme } = useTheme()
@@ -59,22 +58,10 @@ export default function DashboardLayout() {
       )}
 
       {/* ── Sidebar ── */}
-      <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
           <div className="sidebar-logo-icon">CD</div>
-          {!collapsed && <span>Campus Drive</span>}
-        </div>
-
-        {/* Toggle sidebar (MOVED TO TOP) */}
-        <div className="sidebar-toggle" style={{ borderTop: 'none', borderBottom: '1px solid var(--border-color)' }}>
-          <button
-            className="btn btn-ghost btn-icon"
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label="Toggle sidebar"
-            style={{ width: '100%' }}
-          >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
+          <span>Campus Drive</span>
         </div>
 
         <nav className="sidebar-nav">
@@ -83,7 +70,7 @@ export default function DashboardLayout() {
               return <div key={i} style={{ height: 1, background: 'var(--border-color)', margin: '0.5rem 0' }} />
             }
             if (link.type === 'label') {
-              return !collapsed && (
+              return (
                 <div key={i} style={{
                   fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)',
                   padding: '0.25rem 1rem', letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -98,10 +85,9 @@ export default function DashboardLayout() {
                 key={link.path}
                 className={`sidebar-link ${isActive(link.path) ? 'active' : ''}`}
                 onClick={() => { navigate(link.path); setMobileOpen(false) }}
-                title={collapsed ? link.label : ''}
               >
                 <Icon size={20} />
-                {!collapsed && <span>{link.label}</span>}
+                <span>{link.label}</span>
               </div>
             )
           })}
@@ -109,9 +95,8 @@ export default function DashboardLayout() {
 
         {/* ──────────────────────────────────────
             Anuncio Sidebar — visible solo para usuarios normales
-            Se oculta cuando el sidebar está colapsado
             ────────────────────────────────────── */}
-        {showAds && !collapsed && (
+        {showAds && (
           <div className="sidebar-ad-slot">
             <AdComponent type="sidebar" />
           </div>
@@ -119,7 +104,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* ── Main content area ── */}
-      <div className={`main-content ${collapsed ? 'sidebar-collapsed' : ''}`}>
+      <div className="main-content">
 
         {/* ── Navbar ── */}
         <header className="navbar">

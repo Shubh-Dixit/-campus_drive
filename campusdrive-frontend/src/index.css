@@ -155,9 +155,7 @@ a:hover {
   z-index: 40;
 }
 
-.sidebar.collapsed {
-  width: 72px;
-}
+
 
 .sidebar-logo {
   padding: 1.25rem;
@@ -225,12 +223,7 @@ a:hover {
   height: 20px;
 }
 
-.sidebar-toggle {
-  padding: 0.75rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: center;
-}
+
 
 .main-content {
   flex: 1;
@@ -239,9 +232,7 @@ a:hover {
   min-height: 100vh;
 }
 
-.main-content.sidebar-collapsed {
-  margin-left: 72px;
-}
+
 
 /* ============================================
    Navbar
