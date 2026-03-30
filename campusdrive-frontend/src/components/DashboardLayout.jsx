@@ -65,6 +65,18 @@ export default function DashboardLayout() {
           {!collapsed && <span>Campus Drive</span>}
         </div>
 
+        {/* Toggle sidebar (MOVED TO TOP) */}
+        <div className="sidebar-toggle" style={{ borderTop: 'none', borderBottom: '1px solid var(--border-color)' }}>
+          <button
+            className="btn btn-ghost btn-icon"
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label="Toggle sidebar"
+            style={{ width: '100%' }}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
+
         <nav className="sidebar-nav">
           {navLinks.filter(l => l.show).map((link, i) => {
             if (link.type === 'divider') {
@@ -104,17 +116,6 @@ export default function DashboardLayout() {
             <AdComponent type="sidebar" />
           </div>
         )}
-
-        {/* Toggle sidebar */}
-        <div className="sidebar-toggle">
-          <button
-            className="btn btn-ghost btn-icon"
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label="Toggle sidebar"
-          >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </button>
-        </div>
       </aside>
 
       {/* ── Main content area ── */}
